@@ -52,7 +52,8 @@ class Somtoday:
         password = hashlib.sha1(password).digest()
         password = self.tohex(base64.encodestring(password))
         username = base64.b64encode(username)
-        loginurl = "http://somtoday.nl/" + schoolname + "/services/mobile/v10/Login/CheckMultiLoginB64/" + username + "/" + password + "/" + brin
+        loginurl = "http://somtoday.nl/" + schoolname + "/services/mobile/v10/Login/CheckMultiLoginB64/" + \
+                   username + "/" + password + "/" + brin
         response = self.getJSON(loginurl)
 
         if response["error"] == "SUCCESS":
@@ -86,30 +87,52 @@ class Somtoday:
         gradesJSON = self.getJSON(gradesurl)["data"]
         return gradesJSON
 
-    def gethomework(self, daysAhead=14):
+    def gethomework(self, daysahead=14):
         """
         Returns all homework for the amount of days specified in daysAhead
 
         Parameters:
-         daysAhead(int): the amount of days ahead the homework has to be displayed.
+         daysahead(int): the amount of days ahead the homework has to be displayed.
 
         Returns:
          A JSON object with all homework until the amount of days ahead.
         """
 
         huiswerkurl = self.baseurl + "Agenda/GetMultiStudentAgendaHuiswerkMetMaxB64/" + self.username + "/" + \
-                      self.password + "/" + self.brin + "/" + str(daysAhead) + "/" + self.leerlingId
+                      self.password + "/" + self.brin + "/" + str(daysahead) + "/" + self.leerlingId
         homeworkJSON = self.getJSON(huiswerkurl)["data"]
         return homeworkJSON
 
-    def getschedule(self, daysAhead):
+    def getschedule(self, daysahead=0):
         """
-        returns all classes for the current day
+        Returns all classes for the current day, or a specified amount of days ahead.
+
+        Parameters:
+         daysahead(float): a number that indicates the amount of days ahead it has to fetch the schedule for. Default=0
+
+        Returns:
+         A JSON object with the schedule for the current day in it.
+         This JSON object contains an array of dictionaries, that contain the following elements:
+          huiswerk:The homework for that class, markup done with html.
+          vak: The subject. Format depends on the format your school uses.
+          begin: The timestamp when this subject starts.(Milliseconds since epoch)
+          titel: The name given on the app, bascially a short summary of the period.
+          afspraakid: I don't know this one yet, if anyone figures something out: let me hear.
+          af: False if there wasn't any homework or if you didn't finish it, true if you finished it.
+          docenten: I guess it should indicate the teacher(s) you have that period, but for me it says none. Testing needed.
+          onderwijsproduct: I don't have a clue. My school doesn't use this.
+          huiswerkid: Should contain the homework for that hour. Doesn't work that well(in my case at least)
+          eind: The timestamp when this period ends(milliseconds since epoch)
+          type: The type of appointment. Most cases this will be ROOSTER.
+          lesuur: The period of this class. Should be parsed to int if used as a number.
+          locatie: The classroom/place in general where this appointment is.
+          afkorting: No idea. Needs testing.
+          omschrijving: Not indicated most of the time, but i guess it is for additional remarks.
         """
-        date = int(time.time() + (daysAhead * 86400)) * 1000
+        date = int(time.time() + (daysahead * 86400)) * 1000
         roosterUrl = self.baseurl + "Agenda/GetMultiStudentAgendaB64/" + self.username + "/" + self.password + "/" + \
                      self.brin + "/" + str(date) + "/" + self.leerlingId
-        scheduleJSON = self.getJSON(roosterUrl)
+        scheduleJSON = self.getJSON(roosterUrl)["data"]
         return scheduleJSON
 
     def tohex(self, convertString):
@@ -129,7 +152,7 @@ class Somtoday:
         return output[:-2]
 
     @staticmethod
-    def getJSON(self, url):
+    def getJSON(url):
         try:
             response = json.loads(urllib2.urlopen(url).read())
         except ValueError:
