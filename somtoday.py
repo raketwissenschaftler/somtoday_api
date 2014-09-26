@@ -39,7 +39,7 @@ class Somtoday:
          brin(str): The brin-code of your school, an unique identifier.
 
         Raises:
-         notActivated: Gets raised if the selected school doesn't support the somtoday app.
+         NotActivated: Gets raised if the selected school doesn't support the somtoday app.
 
          invalidDetails: If the credentials used to login are invalid.
 
@@ -65,7 +65,7 @@ class Somtoday:
             self.brin = brin
             self.baseurl = "https://somtoday.nl/" + schoolname + "/services/mobile/v10/"
         elif response["error"] == "FEATURE_NOT_ACTIVATED":
-            raise notActivated("Your school doesn't support the somtoday app, wich was used to create this api.")
+            raise NotActivated("Your school doesn't support the somtoday app, wich was used to create this api.")
         elif response["error"] == "FAILED_AUTHENTICATION":
             raise invalidDetails("Invalid login details")
         elif response["error"] == "FAILED_OTHER_TYPE":
@@ -79,7 +79,6 @@ class Somtoday:
 
         Returns:
          A JSON object with the most recent grades, ordered by age.
-
         """
 
         gradesurl = self.baseurl + "Cijfers/GetMultiCijfersRecentB64/" + self.username + "/" + self.password + "/" + \
@@ -111,39 +110,47 @@ class Somtoday:
          daysahead(float): a number that indicates the amount of days ahead it has to fetch the schedule for. Default=0
 
         Returns:
-         A JSON object with the schedule for the current day in it.
-         This JSON object contains an array of dictionaries, that contain the following elements:
-          huiswerk:The homework for that class, markup done with html.
-          vak: The subject. Format depends on the format your school uses.
-          begin: The timestamp when this subject starts.(Milliseconds since epoch)
-          titel: The name given on the app, bascially a short summary of the period.
-          afspraakid: I don't know this one yet, if anyone figures something out: let me hear.
-          af: False if there wasn't any homework or if you didn't finish it, true if you finished it.
-          docenten: I guess it should indicate the teacher(s) you have that period, but for me it says none. Testing needed.
-          onderwijsproduct: I don't have a clue. My school doesn't use this.
-          huiswerkid: Should contain the homework for that hour. Doesn't work that well(in my case at least)
-          eind: The timestamp when this period ends(milliseconds since epoch)
-          type: The type of appointment. Most cases this will be ROOSTER.
-          lesuur: The period of this class. Should be parsed to int if used as a number.
-          locatie: The classroom/place in general where this appointment is.
-          afkorting: No idea. Needs testing.
-          omschrijving: Not indicated most of the time, but i guess it is for additional remarks.
+         A JSON object with the schedule for the chosen day in it.
         """
         date = int(time.time() + (daysahead * 86400)) * 1000
-        roosterUrl = self.baseurl + "Agenda/GetMultiStudentAgendaB64/" + self.username + "/" + self.password + "/" + \
+        roosterurl = self.baseurl + "Agenda/GetMultiStudentAgendaB64/" + self.username + "/" + self.password + "/" + \
                      self.brin + "/" + str(date) + "/" + self.leerlingId
-        scheduleJSON = self.getJSON(roosterUrl)["data"]
+        scheduleJSON = self.getJSON(roosterurl)["data"]
         return scheduleJSON
 
-    def tohex(self, convertString):
+    def changehomeworkstatus(self,homeworkid, appointmentid, status):
+        """
+        Changes the status of the given homework.
+
+        Parameters:
+          homeworkid(str): the "huiswerkid" returned by gethomework().
+          appointmentid(str): the "afspraakid" returneb by gethomework().
+          status(bool): The status you want to give that assignment. True is done, false is not done.
+
+        Returns:
+         Boolean: True if the status change succeeded, false if not.
+        """
+        statusurl = self.baseurl + "Agenda/HuiswerkDoneB64/" + self.username + "/" + self.password + "/" + self.brin + \
+                    "/" + str(appointmentid) + "/" + str(homeworkid) + "/"
+        if status==True:
+            statusurl += "1"
+        elif status==False:
+            statusurl += "0"
+        response=self.getJSON(statusurl)["status"]
+        if response=="OK":
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def tohex(convertstring):
         """
         An obscure function topicus forced me to use. It works.
 
         """
         output = ""
         hexChars = "0123456789abcdef"
-        symbols = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVW[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
-        for char in convertString:
+        for char in convertstring:
             asciiValue = ord(char)
             index1 = asciiValue % 16
             index2 = (asciiValue - index1) / 16
@@ -153,6 +160,10 @@ class Somtoday:
 
     @staticmethod
     def getJSON(url):
+        """
+        Returns the JSON the api returns from a given url. Only to be used internally.
+
+        """
         try:
             response = json.loads(urllib2.urlopen(url).read())
         except ValueError:
@@ -162,7 +173,7 @@ class Somtoday:
         return response
 
 
-class notActivated(Exception):
+class NotActivated(Exception):
     pass
 
 
@@ -176,4 +187,3 @@ class invalidAccount(Exception):
 
 class invalidResponse(Exception):
     pass
-
