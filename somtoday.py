@@ -173,17 +173,17 @@ class Somtoday:
         return response
 
 
-class NotActivated(Exception):
-    pass
+    class NotActivated(Exception):
+        pass
 
 
-class invalidDetails(Exception):
-    pass
+    class invalidDetails(Exception):
+        pass
 
 
-class invalidAccount(Exception):
-    pass
+    class invalidAccount(Exception):
+        pass
 
 
-class invalidResponse(Exception):
-    pass
+    class invalidResponse(Exception):
+        pass
