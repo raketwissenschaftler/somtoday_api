@@ -1,11 +1,14 @@
 Somtoday api
 ============
 
-A python wrapper for the api somtoday uses in their mobile app
+A python and php wrapper for the api somtoday uses in their mobile app
 
 It uses a GPL licence, wich is summarized [here](http://choosealicense.com/licenses/gpl-2.0/).
 
 The school abbreveations can be found [here](http://servers.somtoday.nl)
+
+Python
+===========
 
 Installation
 ============
@@ -28,4 +31,21 @@ som.changehomeworkstatus("6374673","7364736", True)#mark homework done
 ```
 Footnote
 =======
-questions? dev@polltato.tk
+questions? ricktrein@hotmail.com
+
+PHP
+=========
+Stephan Meijer was feeling inspirated and rewrote this api in PHP.
+
+Installation
+============
+1. Download the file
+2. Put it in the same folder as the script you would like to use it in
+3. ``include "Somtoday.php"``
+4. Make a neat gun for the people who are still alive!
+
+Footnote
+=========
+questions?
+me@stephanmeijer.com
+
