@@ -61,7 +61,8 @@ class SOMtodayUser {
 		$hash = base64_encode( $hash );
 
 		// Converting string to hex, another useless layer
-		$hash = bin2hex($hash)
+		$hash = bin2hex($hash);
+		return $hash;
 
 	
 
