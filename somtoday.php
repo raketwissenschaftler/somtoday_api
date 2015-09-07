@@ -52,22 +52,15 @@ class SOMtodayUser {
 	 * @param String $password Plain-text password
 	 * @return String Hashed and encoded password
 	 */
-	private function hashAndEncodePassword($password) {
-
+private function hashAndEncodePassword($password) {
 		// Yes, SOMtoday is using SHA1. This is a shame!
-		$hash = sha1( $password );
-
+		$hash = sha1($password,true);
 		// Base64, how useless..
-		$hash = base64_encode( $hash );
-
+		$hash = base64_encode($hash);
 		// Converting string to hex, another useless layer
-		$hexPassword = "";
-		for ($i=0; $i < strlen( $password ); $i++) {
-			$hexPassword .= dechex( ord( $password[ $i ] ) );
-		}
-
-		$hash = $hexPassword;
-
+		$hash = bin2hex($hash);
+		return $hash;
+	
 	}
 
 	/**
