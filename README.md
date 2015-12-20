@@ -36,6 +36,7 @@ questions? ricktrein@hotmail.com
 PHP
 =========
 Stephan Meijer was feeling inspirated and rewrote this api in PHP.
+His wrapper however didn't work anymore, so I, Rick Bakker (@RickBakkr) fixed the file.
 
 Installation
 ============
@@ -44,8 +45,17 @@ Installation
 3. ``include "Somtoday.php"``
 4. Make a neat gun for the people who are still alive!
 
+Examples
+===========
+```PHP
+include 'Somtoday.php';
+
+$som = SOMtodayUser("henk","mypassword","myschool","dembrin")
+
+$som->changeHomeworkStatus("6374673","7364736", True)#mark homework done
+```
+
 Footnote
 =========
-questions?
-me@stephanmeijer.com
-
+questions? rickbakkr@gmail.com
+Only send proper mails. Inappropriate e-mails will be deleted immediately.
