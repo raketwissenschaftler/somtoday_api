@@ -6,6 +6,15 @@
  * @version 1.0.0
  */
 
+/**
+ * @author Rick Bakker <rickbakkr@gmail.com>
+ * @version 1.0.1
+ * 
+ * This version is working at 20-12-2015.
+ * SOM might do changes since then! 
+ *
+ */
+
 class SOMtodayUser {
 
 	public $pupilID;
@@ -53,29 +62,31 @@ class SOMtodayUser {
 	 * @return String Hashed and encoded password
 	 */
 	private function hashAndEncodePassword($password) {
-                // Yes, SOMtoday is using SHA1. This is a shame!
-                $hash = sha1($password,true);
-                // Base64, how useless..
-                $hash = base64_encode($hash);
-                // Converting string to hex, another useless layer
-                $hash = bin2hex($hash);
-                return $hash;
+		// Yes, SOMtoday is using SHA1. This is a shame!
+		$hash = sha1($password,true);
+		// Base64, how useless..
+		$hash = base64_encode($hash);
+		// Converting string to hex, another useless layer
+		$hash = bin2hex($hash);
+		return $hash;
+	
+	}
 
-        }
+	/**
+	 * 
+	 */
+	private function login($username, $password) {
 
-        private function login($username, $password) {
+		$passwordHash = $this->hashAndEncodePassword( $password );
+		$username = base64_encode($username);
 
-                $passwordHash = $this->hashAndEncodePassword( $password );
-                $username = base64_encode($username);
+		$baseURL = "https://somtoday.nl/" . $this->schoolName . "/services/mobile/v10/";
 
-                $baseURL = "https://somtoday.nl/" . $this->schoolName . "/services/mobile/v10/";
+		$url = $baseURL . "Login/CheckMultiLoginB64/" . $username . "/" . $passwordHash . "/" . $this->BRIN;
 
-                $url = $baseURL . "Login/CheckMultiLoginB64/" . $username . "/" . $passwordHash . "/" . $this->BRIN;
+		$response = json_decode( file_get_contents( $url ) , true);
 
-                $response = json_decode( file_get_contents( $url ) , true);
-
-                if ( $response["error"] == "SUCCESS" ) {
-
+		if ( $response["error"] == "SUCCESS" ) {
 
 			$fullName = $response["leerlingen"][0]["fullName"];
 			$pupilID = (string) $response["leerlingen"][0]["leerlingId"];
@@ -84,6 +95,7 @@ class SOMtodayUser {
 			$this->baseURL = $baseURL;
 			$this->pupilID = $pupilID;
 			$this->password = $passwordHash;
+			$this->username = $username;
 
 			return array(
 				"success" => true,
@@ -128,8 +140,8 @@ class SOMtodayUser {
 	 */
 	public function getGrades() {
 		$url = $this->baseURL . "Cijfers/GetMultiCijfersRecentB64/" . $this->username . "/" . $this->password . "/" . $this->BRIN . "/" . $this->pupilID;
-        $response = json_decode( file_get_contents( $url ) );
-
+        $response = json_decode( file_get_contents( $url ), true);
+	
         return $response["data"];
 	}
 
@@ -143,7 +155,7 @@ class SOMtodayUser {
 
         $url = $this->baseURL . "Agenda/GetMultiStudentAgendaHuiswerkMetMaxB64/" . $this->username . "/" . $this->password . "/" . $this->BRIN . "/" . $daysAhead . "/" . $this->pupilID;
 
-        $response = json_decode( file_get_contents( $url ) );
+        $response = json_decode( file_get_contents( $url ), true );
 
         return $response["data"];
 	}
@@ -156,7 +168,8 @@ class SOMtodayUser {
 		$date = ( time() + ( $daysAhead * 86400 ) ) * 1000;
 
         $url = $this->baseURL . "Agenda/GetMultiStudentAgendaB64/" . $this->username . "/" . $this->password . "/" . $this->BRIN . "/" . (string) $date . "/" . $this->pupilID;
-        $response = json_decode( file_get_contents( $url ) );
+        $response = json_decode( file_get_contents( $url ) , true);
+	
 
         return $response["data"];
 	}
@@ -174,7 +187,7 @@ class SOMtodayUser {
 
         $url = $this->baseURL . "Agenda/HuiswerkDoneB64/" . $this->username . "/" . $this->password . "/" . $this->BRIN . "/" . (string) $appointmentID. "/" . (string) $homeworkID . "/" . (string) $status;
         
-        $responseStatus = json_decode( file_get_contents( $url ) )["status"];
+        $responseStatus = json_decode( file_get_contents( $url ), true)["status"];
         
         return ( $responseStatus == "OK" );
 
