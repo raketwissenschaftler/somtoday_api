@@ -52,31 +52,30 @@ class SOMtodayUser {
 	 * @param String $password Plain-text password
 	 * @return String Hashed and encoded password
 	 */
-private function hashAndEncodePassword($password) {
-		// Yes, SOMtoday is using SHA1. This is a shame!
-		$hash = sha1($password,true);
-		// Base64, how useless..
-		$hash = base64_encode($hash);
-		// Converting string to hex, another useless layer
-		$hash = bin2hex($hash);
-		return $hash;
-	
-	}
+	private function hashAndEncodePassword($password) {
+                // Yes, SOMtoday is using SHA1. This is a shame!
+                $hash = sha1($password,true);
+                // Base64, how useless..
+                $hash = base64_encode($hash);
+                // Converting string to hex, another useless layer
+                $hash = bin2hex($hash);
+                return $hash;
 
-	/**
-	 * 
-	 */
-	private function login($username, $password) {
+        }
 
-		$passwordHash = $this->hashAndEncodePassword( $password );
+        private function login($username, $password) {
 
-		$baseURL = "https://somtoday.nl/" . $this->schoolName . "/services/mobile/v10/";
+                $passwordHash = $this->hashAndEncodePassword( $password );
+                $username = base64_encode($username);
 
-		$url = $baseURL . "Login/CheckMultiLoginB64/" . $username . "/" . $password . "/" . $this->BRIN;
+                $baseURL = "https://somtoday.nl/" . $this->schoolName . "/services/mobile/v10/";
 
-		$response = json_decode( file_get_contents( $login_url ) );
+                $url = $baseURL . "Login/CheckMultiLoginB64/" . $username . "/" . $passwordHash . "/" . $this->BRIN;
 
-		if ( $response["error"] == "SUCCESS" ) {
+                $response = json_decode( file_get_contents( $url ) , true);
+
+                if ( $response["error"] == "SUCCESS" ) {
+
 
 			$fullName = $response["leerlingen"][0]["fullName"];
 			$pupilID = (string) $response["leerlingen"][0]["leerlingId"];
