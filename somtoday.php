@@ -46,15 +46,41 @@ class SOMtodayUser
      * @param String $schoolName The name of your school, as found on http://servers.somtoday.nl
      * @param String $BRIN The BRIN-code of your school, an unique identifier
      */
-    function __construct($username, $password, $schoolName, $BRIN)
+    function __construct($username, $password, $schoolName, $BRIN = null)
     {
         
         $this->username   = $username;
         $this->schoolName = $schoolName;
-        $this->BRIN       = $BRIN;
+        if(is_null($BRIN))
+        {
+            $this->BRIN = $this->brinLookup($this->schoolName);
+        } else {
+            $this->BRIN = $BRIN;
+        }
         
         $login = $this->login($username, $password);
         
+    }
+    
+    /*
+     * Method to get the institution's BRIN based on their abbreviation.
+     *
+     * @param String $schoolName Plain-text abbreviation
+     * @return String BRIN of the institiution
+     */
+    private function brinLookup($schoolName)
+    {
+        $servers = file_get_contents('http://servers.somtoday.nl/');
+        $servers = json_decode($servers, true);
+            
+        foreach($servers[0]['instellingen'] as $instelling) 
+        {
+            if($instelling['afkorting'] == $schoolName) 
+            {
+                return $instelling['brin'];
+            }
+        }
+        return false;
     }
     
     /**
