@@ -35,27 +35,7 @@ questions? ricktrein@hotmail.com
 
 PHP
 =========
-Stephan Meijer was feeling inspirated and rewrote this api in PHP.
-His wrapper however didn't work anymore, so I, Rick Bakker (@RickBakkr) fixed the file.
+The PHP wrapper has moved to a repository and the wrapper will be maintained by Rick Bakker. (@RickBakkr)
 
-Installation
-============
-1. Download the file
-2. Put it in the same folder as the script you would like to use it in
-3. ``include "Somtoday.php"``
-4. Make a neat gun for the people who are still alive!
-
-Examples
-===========
-```PHP
-include 'Somtoday.php';
-
-$som = SOMtodayUser("henk","mypassword","myschool","dembrin")
-
-$som->changeHomeworkStatus("6374673","7364736", True)#mark homework done
-```
-
-Footnote
-=========
-questions? rickbakkr@gmail.com
-Only send proper mails. Inappropriate e-mails will be deleted immediately.
+You can find the new repo here:
+https://github.com/RickBakkr/SOMtoday
